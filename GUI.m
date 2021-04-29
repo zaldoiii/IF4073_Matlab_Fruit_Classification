@@ -22,7 +22,7 @@ function varargout = GUI(varargin)
 
 % Edit the above text to modify the response to help GUI
 
-% Last Modified by GUIDE v2.5 17-Apr-2021 15:39:17
+% Last Modified by GUIDE v2.5 29-Apr-2021 14:19:09
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -76,6 +76,7 @@ varargout{1} = handles.output;
 % --- Executes on button press in button_browse_image.
 function button_browse_image_Callback(hObject, eventdata, handles)
 [rawname, rawpath] = uigetfile({'*.jpg'},'Select Image Data');
+global fullname;
 fullname = [rawpath rawname];
 set(handles.text_path_image, 'String', fullname);
 
@@ -137,18 +138,18 @@ function edit3_DeleteFcn(hObject, eventdata, handles)
 
 
 
-function edit4_Callback(hObject, eventdata, handles)
-% hObject    handle to edit4 (see GCBO)
+function text_result_Callback(hObject, eventdata, handles)
+% hObject    handle to text_result (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit4 as text
-%        str2double(get(hObject,'String')) returns contents of edit4 as a double
+% Hints: get(hObject,'String') returns contents of text_result as text
+%        str2double(get(hObject,'String')) returns contents of text_result as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function edit4_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit4 (see GCBO)
+function text_result_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to text_result (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -157,3 +158,28 @@ function edit4_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in button_identify.
+function button_identify_Callback(hObject, eventdata, handles)
+global fullname; 
+
+Img = imread(fullname);
+cform = makecform('srgb2lab');
+lab = applycform(Img,cform);
+b = lab(:,:,2);
+bw = b>140;
+bw = imfill(bw,'holes');
+hsv = rgb2hsv(Img);
+h = hsv(:,:,1);
+s = hsv(:,:,2);
+h(~bw) = 0;
+s(~bw) = 0;
+ciri_h(1) = mean(mean(h));
+ciri_s(1) = mean(mean(s));
+
+CompactMdl = loadLearnerForCoder('model_1');
+sample = [ciri_h ciri_s];
+res = predict(CompactMdl,sample);
+
+set(handles.text_result, 'String', res);

@@ -1,10 +1,10 @@
 %%% Dataset Training
 % menetapkan lokasi folder data latih
-folder_training_pisang = 'I:\KULYAH\SEM7\Citra\IF4073_Matlab_Fruit_Classification\Images\Training\Pisang';
+folder_training_pisang = 'Images\Training\Pisang';
 nama_file_training_pisang = dir(fullfile(folder_training_pisang,'*.jpg'));
 jumlah_file_training_pisang = numel(nama_file_training_pisang);
 
-folder_training_apel = 'I:\KULYAH\SEM7\Citra\IF4073_Matlab_Fruit_Classification\Images\Training\Apel';
+folder_training_apel = 'Images\Training\Apel';
 nama_file_training_apel = dir(fullfile(folder_training_apel,'*.jpg'));
 jumlah_file_training_apel = numel(nama_file_training_apel);
 
@@ -108,6 +108,7 @@ end
 % -----------------------------------------------------------------------------------------------
 
 % menampilkan sebaran data latih
+%{
 figure;
 h1 = gscatter(ciri_h,ciri_s,kelas_buah,'rgbk','.',15);
 set(h1,'LineWidth',2)
@@ -116,6 +117,7 @@ xlabel('hue')
 ylabel('saturation')
 legend('pisang (latih)','apel (latih)','Location','SE')
 title('{\bf Sebaran data latih}')
+%}
 
 training = [ciri_h ciri_s];
 sample = [ciri_h_test ciri_s_test];
@@ -123,6 +125,11 @@ sample = [ciri_h_test ciri_s_test];
 disp(size(training))
 disp(size(sample))
 c = fitcknn(training, kelas_buah,'NumNeighbors',1,'Standardize',1);
+
+%%Save model
+saveLearnerForCoder(c,'model_1');
+
+%{
 Class = predict(c,sample);
 figure,
 gscatter(ciri_h,ciri_s,kelas_buah,'rgbk','.',15);
@@ -135,3 +142,4 @@ hold on
 gscatter(ciri_h_test',ciri_s_test',Class,[1 1 0; 1 0 1; 0 1 1; .5 .5 .5],'x',15);
 legend('pisang (train)','apel (train)','pisang (test)','apel (test)','Location','SE')
 hold off
+%}
