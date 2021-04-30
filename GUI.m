@@ -58,7 +58,7 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 movegui(hObject, 'center');
-set(handles.figure1, 'Name', 'Image Classification');
+set(handles.figure1, 'Name', 'Fruit Classification');
 % UIWAIT makes GUI wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
