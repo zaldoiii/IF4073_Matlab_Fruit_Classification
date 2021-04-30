@@ -77,12 +77,14 @@ varargout{1} = handles.output;
 function button_browse_image_Callback(hObject, eventdata, handles)
 global fullname;
 [rawname, rawpath] = uigetfile({'*.jpg'},'Select Image Data');
-if ~isequal(rawname,0)   
+if ~isequal(rawname,0)
+
+    
     fullname = [rawpath rawname];
     set(handles.text_path_image, 'String', fullname);
 
     im = imread(fullname);
-    axes(handles.layer_image);
+    axis(handles.layer_image);
     imagesc(im);
     
     set(handles.button_identify,'Enable','on')
@@ -169,27 +171,22 @@ end
 function button_identify_Callback(hObject, eventdata, handles)
 global fullname; 
 
-if isfile('model_classification.mat')
-    CompactMdl = loadLearnerForCoder('model_classification');
-    Img = imread(fullname);
-    cform = makecform('srgb2lab');
-    lab = applycform(Img,cform);
-    b = lab(:,:,2);
-    bw = b>140;
-    bw = imfill(bw,'holes');
-    hsv = rgb2hsv(Img);
-    h = hsv(:,:,1);
-    s = hsv(:,:,2);
-    h(~bw) = 0;
-    s(~bw) = 0;
-    ciri_h(1) = mean(mean(h));
-    ciri_s(1) = mean(mean(s));
+Img = imread(fullname);
+cform = makecform('srgb2lab');
+lab = applycform(Img,cform);
+b = lab(:,:,2);
+bw = b>140;
+bw = imfill(bw,'holes');
+hsv = rgb2hsv(Img);
+h = hsv(:,:,1);
+s = hsv(:,:,2);
+h(~bw) = 0;
+s(~bw) = 0;
+ciri_h(1) = mean(mean(h));
+ciri_s(1) = mean(mean(s));
 
-    sample = [ciri_h ciri_s];
-    res = predict(CompactMdl,sample);
+CompactMdl = loadLearnerForCoder('model_classification');
+sample = [ciri_h ciri_s];
+res = predict(CompactMdl,sample);
 
-    set(handles.text_result, 'String', res);
-else
-    set(handles.text_result, 'String', "Jalankan training img_classification dahulu");
-    return
-end
+set(handles.text_result, 'String', res);
